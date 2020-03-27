@@ -1,0 +1,33 @@
+{
+  "name": "bitcoin-js",
+  "version": "0.1.0",
+  "description": "Complete Bitcoin Wallet implementation",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zemse/bitcoin-js.git"
+  },
+  "keywords": [
+    "bitcoin",
+    "wallet",
+    "cryptography"
+  ],
+  "author": "Soham Zemse <sohamzemse143@gmail.com> (https://github.com/zemse)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zemse/bitcoin-js/issues"
+  },
+  "homepage": "https://github.com/zemse/bitcoin-js#readme",
+  "devDependencies": {
+    "mocha": "^7.1.1"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "bitcoinjs-lib": "^5.1.7",
+    "bs58": "^4.0.1",
+    "ethers": "^4.0.46"
+  }
+}
