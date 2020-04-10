@@ -1,4 +1,6 @@
 const utils = require('./utils');
 const { version } = require('./package.json');
 
-module.exports = { utils, version };
+const providers = require('./providers');
+
+module.exports = { utils, version, providers };
