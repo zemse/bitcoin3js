@@ -19,9 +19,7 @@ class BaseProvider {
   async getBlockHeight() {
     const response = await axios.get(this._engine.functions.blockHeight.url());
     const newBlockHeight = this._engine.functions.blockHeight.parse(response.data);
-    if(newBlockHeight > this._lastBlockNumber) {
-      this._lastBlockNumber = newBlockHeight;
-    }
+    // const newBlockHeight = this._lastBlockNumber + 2; // for temporarily testing callbacks
     return newBlockHeight;
   }
 
@@ -33,6 +31,11 @@ class BaseProvider {
   async getUtxos(address) {
     const response = await axios.get(this._engine.functions.utxos.url(address));
     return this._engine.functions.utxos.parse(response.data);
+  }
+
+  async getTransactions(address, options) {
+    const response = await axios.get(this._engine.functions.transactions.url(address, options));
+    return this._engine.functions.transactions.parse(response.data);
   }
 
   on(event, callback) {
@@ -48,12 +51,11 @@ class BaseProvider {
 
   onBlock(callback) {
     const intF = async() => {
-      let lastBlockNumber = this._lastBlockNumber;
       const newBlockHeight = await this.getBlockHeight();
-      if(newBlockHeight > lastBlockNumber && lastBlockNumber !== -1) {
-        while(lastBlockNumber < newBlockHeight) {
-          lastBlockNumber++;
-          callback(lastBlockNumber);
+      if(this._lastBlockNumber < newBlockHeight && this._lastBlockNumber !== -1) {
+        while(this._lastBlockNumber < newBlockHeight) {
+          this._lastBlockNumber++;
+          callback(this._lastBlockNumber);
         }
       }
     };

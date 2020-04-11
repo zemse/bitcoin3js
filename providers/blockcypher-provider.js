@@ -1,34 +1,75 @@
 const bitcoin = require('bitcoinjs-lib');
 const BaseProvider = require('./base-provider');
 
+const addUrlParams = (url, params = {}) => {
+  if(Object.keys(params).length > 0) {
+    url += '?' + require('qs').stringify(params);
+  }
+  return url;
+}
+
 const engine = (network, apiKey) => {
   let networkProfile;
+  let baseUrl;
   switch(network) {
     case 'btc':
       networkProfile = bitcoin.networks.bitcoin;
+      baseUrl = 'https://api.blockcypher.com/v1/btc/main';
+      break;
     case 'test3':
       networkProfile = bitcoin.networks.testnet;
+      baseUrl = 'https://api.blockcypher.com/v1/btc/test3';
+      break;
     default:
       networkProfile = bitcoin.networks.bitcoin;
+      baseUrl = 'https://api.blockcypher.com/v1/btc/main';
+      break;
   }
   return {
     name: 'blockcypher',
     network: networkProfile,
     functions: {
       blockHeight: {
-        url: () => 'https://api.blockcypher.com/v1/btc/test3',
+        url: () => addUrlParams(baseUrl, {token: apiKey}),
         parse: apiOutput => {
           return apiOutput.height;
         }
       },
       balance: {
-        url: address => `https://api.blockcypher.com/v1/btc/test3/addrs/${address}/balance`,
+        url: address => addUrlParams(`${baseUrl}/addrs/${address}/balance`, {token: apiKey}),
         parse: apiOutput => {
           return apiOutput.balance;
         }
       },
+      transactions: {
+        url: (address, options = {}) => {
+          const parameters = {};
+          if(apiKey) parameters.token = apiKey;
+          if(options.fromBlock) {
+            if(isNaN(options.fromBlock)) throw new Error('Invalid fromBlock numeric: '+options.fromBlock);
+            parameters.after = +options.fromBlock - 1;
+          }
+          if(options.toBlock && options.toBlock !== 'latest') {
+            if(isNaN(options.toBlock)) throw new Error('Invalid toBlock numeric: '+options.toBlock);
+            parameters.before = +options.toBlock + 1;
+          }
+          if(options.confirmations) parameters.confirmations = options.confirmations;
+          if(options.confidence) parameters.confidence = options.confidence;
+          if(options.unspentOnly) parameters.unspentOnly = options.unspentOnly;
+          if(options.includeScript) parameters.includeScript = options.includeScript;
+          if(options.includeConfidence) parameters.includeConfidence = options.includeConfidence;
+          return addUrlParams(`${baseUrl}/addrs/${address}`, parameters);
+        },
+        parse: (apiOutput) => {
+          return apiOutput.txrefs || [];
+        }
+      },
       utxos: {
-        url: address => `https://api.blockcypher.com/v1/btc/test3/addrs/${address}/full?token=c29426c605e541bea307de3a54d94fcf&unspentOnly=true&includeHex=true`,
+        url: address => addUrlParams(`${baseUrl}/addrs/${address}/full`, {
+          token: apiKey,
+          unspentOnly: true,
+          includeHex: true
+        }),
         parse: (apiOutput, userAddress) => {
           const address = apiOutput.data.address || userAddress;
           const unspent = [];
@@ -54,7 +95,7 @@ const engine = (network, apiKey) => {
         }
       },
       txPush: {
-        url: () => `https://api.blockcypher.com/v1/btc/test3/txs/push${apiKey ? `?token=${apiKey}` : ''}`,
+        url: () => addUrlParams(`${baseUrl}/txs/push`, {token: apiKey}),
         body: hex => {tx: hex},
         parse: apiOutput => {
           return apiOutput
