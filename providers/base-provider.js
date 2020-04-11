@@ -47,13 +47,18 @@ class BaseProvider {
   }
 
   onBlock(callback) {
-    const intervalId = setInterval(async() => {
+    const intF = async() => {
+      let lastBlockNumber = this._lastBlockNumber;
       const newBlockHeight = await this.getBlockHeight();
-      if(newBlockHeight > this._lastBlockNumber) {
-        this._lastBlockNumber = newBlockHeight;
-        callback(newBlockHeight);
+      if(newBlockHeight > lastBlockNumber && lastBlockNumber !== -1) {
+        while(lastBlockNumber < newBlockHeight) {
+          lastBlockNumber++;
+          callback(lastBlockNumber);
+        }
       }
-    }, this._pollingInterval);
+    };
+    const intervalId = setInterval(intF, this._pollingInterval);
+    intF();
 
     this._events.push({
       type: 'new-block',

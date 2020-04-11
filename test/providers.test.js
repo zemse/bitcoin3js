@@ -22,7 +22,9 @@ describe('Blockcypher Provider', () => {
 
   it('onblock initiate and stop', async() => {
     const provider = new bitcoin.providers.BlockcypherProvider('test3');
-    provider.on('block', console.log);
+    provider.on('block', blockNumber => {
+      console.log('callback', blockNumber);
+    });
     assert(provider._events.length === 1, 'active event should be added');
     assert(provider._events[0].type === 'new-block', 'on-block event should be mentioned');
 
