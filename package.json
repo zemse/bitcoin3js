@@ -1,5 +1,5 @@
 {
-  "name": "bitcoin-js",
+  "name": "bitcoin3js",
   "version": "0.1.0",
   "description": "Complete Bitcoin Wallet implementation",
   "main": "index.js",
