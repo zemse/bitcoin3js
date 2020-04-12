@@ -35,6 +35,12 @@ const engine = (network, apiKey) => {
           return apiOutput.height;
         }
       },
+      block: {
+        url: blockHashOrHeight => addUrlParams(`${baseUrl}/blocks/${blockHashOrHeight}`, {token: apiKey}),
+        parse: apiOutput => {
+          return apiOutput;
+        }
+      },
       balance: {
         url: address => addUrlParams(`${baseUrl}/addrs/${address}/balance`, {token: apiKey}),
         parse: apiOutput => {
