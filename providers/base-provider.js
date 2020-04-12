@@ -40,7 +40,7 @@ class BaseProvider {
 
   async getTransactions(address, options) {
     const response = await axios.get(this._engine.functions.transactions.url(address, options));
-    return this._engine.functions.transactions.parse(response.data);
+    return this._engine.functions.transactions.parse(response.data, options);
   }
 
   on(event, callback) {

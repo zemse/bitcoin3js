@@ -66,7 +66,13 @@ const engine = (network, apiKey) => {
           if(options.includeConfidence) parameters.includeConfidence = options.includeConfidence;
           return addUrlParams(`${baseUrl}/addrs/${address}`, parameters);
         },
-        parse: (apiOutput) => {
+        parse: (apiOutput, options = {}) => {
+          if(apiOutput.txrefs && (options.fromBlock || options.toBlock)) {
+            apiOutput.txrefs = apiOutput.txrefs.filter(txref => {
+              return options.fromBlock ? (options.fromBlock <= txref.block_height) : true
+              && options.toBlock ? (txref.block_height <= options.toBlock) : true;
+            });
+          }
           return apiOutput.txrefs || [];
         }
       },
