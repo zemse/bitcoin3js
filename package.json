@@ -1,14 +1,14 @@
 {
   "name": "bitcoin3js",
   "version": "0.1.0",
-  "description": "Complete Bitcoin Wallet implementation",
+  "description": "Complete Bitcoin Provider and Wallet Implementation",
   "main": "index.js",
   "scripts": {
     "test": "mocha test.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zemse/bitcoin-js.git"
+    "url": "git+https://github.com/zemse/bitcoin3js.git"
   },
   "keywords": [
     "bitcoin",
