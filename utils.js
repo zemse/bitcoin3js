@@ -64,6 +64,30 @@ async function fetchBalanceFromPrivateKey(privateKey, provider) {
   return await fetchBalanceFromAddress(address, provider);
 }
 
+function isHexString(str) {
+  if(typeof str !== 'string' || str.slice(0,2) !== '0x') return false;
+  const regexp = /^[0-9a-fA-F]+$/;
+  return regexp.test(str.slice(2));
+}
+
+function isBytes32Hex(str) {
+  return isHexString(str) && str.length === 66;
+}
+
+function addUrlParams(url, params = {}) {
+  if(Object.keys(params).length > 0) {
+    url += '?' + require('qs').stringify(params);
+  }
+  return url;
+}
+
 module.exports = {
-  getWifFromPrivateKey, getAddressFromWif, getAddressFromPrivateKey, fetchBalanceFromAddress, fetchBalanceFromPrivateKey
+  getWifFromPrivateKey,
+  getAddressFromWif,
+  getAddressFromPrivateKey,
+  fetchBalanceFromAddress,
+  fetchBalanceFromPrivateKey,
+  isHexString,
+  isBytes32Hex,
+  addUrlParams,
 };

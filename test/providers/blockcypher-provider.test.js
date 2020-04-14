@@ -1,5 +1,5 @@
 const assert = require('assert');
-const bitcoin = require('../');
+const bitcoin = require('../../');
 
 describe('Blockcypher Provider', () => {
   let provider;
