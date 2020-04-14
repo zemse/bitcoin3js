@@ -76,7 +76,7 @@ class BitapsProvider {
   }
 
   async getBlock(blockHashOrHeight) {
-    if(typeof height !== 'number' || isBytes32Hex(blockHashOrHeight)) throw new Error('block height should be number or hex string');
+    if(typeof blockHashOrHeight !== 'number' || isBytes32Hex(blockHashOrHeight)) throw new Error('block height should be number or hex string: '+ blockHashOrHeight);
 
     if(typeof blockHashOrHeight === 'string' && blockHashOrHeight.slice(0,2) === '0x') blockHashOrHeight = blockHashOrHeight.slice(2);
 
