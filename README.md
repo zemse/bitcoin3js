@@ -1,8 +1,8 @@
 # Bitcoin3js
 
-> Under Development
+[![Node.js CI](https://github.com/zemse/bitcoin3js/workflows/Node.js%20CI/badge.svg)](https://github.com/zemse/bitcoin3js/workflows/Node.js%20CI/badge.svg)
 
-Intends to be a complete Bitcoin Provider and Wallet Implementation.
+Intends to be a complete Bitcoin Provider and Wallet Implementation. Currently, under development.
 
 ```javascript
 const bitcoin = require('bitcoin3js');
@@ -16,7 +16,6 @@ provider.on('block', blockNumber => {
 });
 
 ```
-
 Roadmap:
 bitcoin
   utils => containing common utility functions
@@ -36,3 +35,5 @@ bitcoin
 
   Wallet constructor => create an instance which would have following methods
     get balance, create transaction, sign transactions, push transaction
+    
+ 
