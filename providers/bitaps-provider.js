@@ -1,44 +1,16 @@
 // Documentation: https://developer.bitaps.com/blockchain
 
 const axios = require('axios');
-const rateLimiter = require('./rate-limiter');
+const BaseProvider = require('./base-provider');
 const { isBytes32Hex, addUrlParams } = require('../utils');
 
-class BitapsProvider {
+class BitapsProvider extends BaseProvider {
   /// @dev args can be an options object or network:string, apiKey:string arguments
   constructor(...args) {
-    if(!args.length) {
-      throw new Error('No arguments passed. Please at least pass network (e.g. main, test3...) as the first argument');
-    }
-
-    /// @dev if argument is an options object
-    if(typeof args[0] === 'object') {
-      const options = args[0];
-      if(!options.network) throw new Error('network property is not present');
-      this._network = options.network;
-      this.baseUrl; /// @dev for checking valid network type
-      if(options._apiKey) this.apiKey = options.network;
-      if(options.requestsLimit || options.seconds) {
-        if(!options.requestsLimit) throw new Error('requestsLimit property is not present');
-        if(!options.seconds) throw new Error('seconds property is not present');
-        this._rateLimiter = rateLimiter(options.requestsLimit, options.seconds);
-      }
-    } else {
-      if(typeof args[0] !== 'string') throw new Error('network should be string');
-      this._network = args[0];
-
-      if(args[1]) {
-        if(typeof args[1] !== 'string') throw new Error('apiKey should be string');
-        this._apiKey = args[1];
-      }
-    }
-
-    if(!this._rateLimiter) {
-      this._rateLimiter = rateLimiter(15, 5);
-    }
+    super(...args);
   }
 
-  get baseUrl() {
+  get _baseUrl() {
     switch(this._network) {
       case 'main':
         return 'https://api.bitaps.com/btc/v1/blockchain';
@@ -57,19 +29,9 @@ class BitapsProvider {
     return `Bitaps Error: ${response.data.error_code} - ${response.data.message} - ${response.data.details}`;
   }
 
-  async getBlockHeight() {
-    const latestBlock = await this.getLatestBlock();
-    return latestBlock.height;
-  }
-
-  /// @dev alias for getBlockHeight
-  getBlockNumber() {
-    return this.getBlockHeight();
-  }
-
   async getLatestBlock() {
     return await this._rateLimiter(async() => {
-      const response = await axios.get(this.baseUrl + '/block/last');
+      const response = await axios.get(this._baseUrl + '/block/last');
       if(response.data.error_code) throw new Error(errorMessage(response));
       return response.data.data.block;
     });
@@ -81,14 +43,14 @@ class BitapsProvider {
     if(typeof blockHashOrHeight === 'string' && blockHashOrHeight.slice(0,2) === '0x') blockHashOrHeight = blockHashOrHeight.slice(2);
 
     return await this._rateLimiter(() => {
-      return axios.get(this.baseUrl + '/block/'+blockHashOrHeight)
+      return axios.get(this._baseUrl + '/block/'+blockHashOrHeight)
     });
   }
 
   async getBalance(address) {
     // add checks for valid network address
     return await this._rateLimiter(async() => {
-      const response = await axios.get(this.baseUrl + '/address/state/' + address);
+      const response = await axios.get(this._baseUrl + '/address/state/' + address);
       if(response.data.error_code) throw new Error(errorMessage(response));
       return response.data.data.balance;
     });
@@ -123,7 +85,7 @@ class BitapsProvider {
       let response;
       while(true) {
         response = await axios.get(
-          addUrlParams(this.baseUrl + '/address/transactions/' + address, {
+          addUrlParams(this._baseUrl + '/address/transactions/' + address, {
             start, end, limit, mode
           })
         );

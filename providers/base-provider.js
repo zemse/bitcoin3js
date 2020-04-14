@@ -1,53 +1,57 @@
 const axios = require('axios');
+const rateLimiter = require('./rate-limiter');
 
 class BaseProvider {
-  /// @dev engine is the provider engine object
-  constructor(engine) {
-    this._engine = engine;
+  /// @dev args from extender class constructor
+  constructor(...args) {
     this._lastBlockNumber = -1;
-    this._promises = [];
-
-    this._promises.push(this.getBlockHeight());
-    this._promises[0].then(value => {
-      this._lastBlockNumber = value;
-    });
 
     this._pollingInterval = 30000;
     this._events = [];
+
+    if(!args.length) {
+      throw new Error('No arguments passed. Please at least pass network (e.g. main, test3...) as the first argument');
+    }
+
+    /// @dev if argument is an options object
+    if(typeof args[0] === 'object') {
+      const options = args[0];
+      if(!options.network) throw new Error('network property is not present');
+      this._network = options.network;
+      this._baseUrl; /// @dev for checking valid network type
+      if(options._apiKey) this.apiKey = options.network;
+      if(options.requestsLimit || options.seconds) {
+        if(!options.requestsLimit) throw new Error('requestsLimit property is not present');
+        if(!options.seconds) throw new Error('seconds property is not present');
+        this._rateLimiter = rateLimiter(options.requestsLimit, options.seconds);
+      }
+    } else {
+      if(typeof args[0] !== 'string') throw new Error('network should be string');
+      this._network = args[0];
+
+      if(args[1]) {
+        if(typeof args[1] !== 'string') throw new Error('apiKey should be string');
+        this._apiKey = args[1];
+      }
+    }
+
+    if(!this._rateLimiter) {
+      this._rateLimiter = rateLimiter(15, 5);
+    }
   }
 
+  /// @dev method dependent on blockcypher or bitaps getLatestBlock method
   async getBlockHeight() {
-    const response = await axios.get(this._engine.functions.blockHeight.url());
-    const newBlockHeight = this._engine.functions.blockHeight.parse(response.data);
-    // const newBlockHeight = this._lastBlockNumber + 2; // for temporarily testing callbacks
-    return newBlockHeight;
+    const latestBlock = await this.getLatestBlock();
+    return latestBlock.height;
   }
 
-  // an alias for getBlockHeight
+  /// @dev an alias for getBlockHeight
   async getBlockNumber() {
     return this.getBlockHeight();
   }
 
-  async getBlock(blockHashOrHeight) {
-    const response = await axios.get(this._engine.functions.block.url(blockHashOrHeight));
-    return this._engine.functions.block.parse(response.data);
-  }
-
-  async getBalance(address) {
-    const response = await axios.get(this._engine.functions.balance.url(address));
-    return this._engine.functions.balance.parse(response.data);
-  }
-
-  async getUtxos(address) {
-    const response = await axios.get(this._engine.functions.utxos.url(address));
-    return this._engine.functions.utxos.parse(response.data);
-  }
-
-  async getTransactions(address, options) {
-    const response = await axios.get(this._engine.functions.transactions.url(address, options));
-    return this._engine.functions.transactions.parse(response.data, options);
-  }
-
+  /// @dev event mechanism
   on(event, callback) {
     switch(event) {
       case 'block':
