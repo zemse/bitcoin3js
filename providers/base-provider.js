@@ -23,6 +23,11 @@ class BaseProvider {
     return newBlockHeight;
   }
 
+  // an alias for getBlockHeight
+  async getBlockNumber() {
+    return this.getBlockHeight();
+  }
+
   async getBlock(blockHashOrHeight) {
     const response = await axios.get(this._engine.functions.block.url(blockHashOrHeight));
     return this._engine.functions.block.parse(response.data);

@@ -2,21 +2,28 @@ const assert = require('assert');
 const bitcoin = require('../');
 
 describe('Blockcypher Provider', () => {
-  const provider = new bitcoin.providers.BlockcypherProvider('test3', 'c29426c605e541bea307de3a54d94fcf');
+  let provider;
 
   it('should create an instance', async() => {
+    provider = new bitcoin.providers.BlockcypherProvider('test3', 'a3c1aad4c151458da9b1fdee2a7fbdf3');
     assert.ok(provider instanceof bitcoin.providers.BlockcypherProvider, 'should be an instance of Blockcypher provider');
 
     assert.ok(provider._engine, 'should have an engine');
     assert.equal(provider._engine.name, 'blockcypher', 'name should be correct');
   });
 
+  let height;
   it('should resolve current block height', async() => {
-    const height = await provider.getBlockHeight();
+    height = await provider.getBlockHeight();
 
     assert.equal(typeof height, 'number', 'should be a number');
     assert.ok(!isNaN(height), 'should not be NaN');
     assert.ok(height > 1697056, 'height should be correct');
+  });
+
+  it('alias getBlockNumber for getBlockHeight should work', async() => {
+    const blockNumber = await provider.getBlockNumber();
+    assert.equal(blockNumber, height);
   });
 
   it('should fetch balance', async() => {
