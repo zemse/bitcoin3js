@@ -41,4 +41,14 @@ describe('Bitaps Provider', () => {
 
     assert.equal(typeof balance, 'number', 'balance should be a number');
   });
+
+  it('fetch transactions for address', async() => {
+    const transactions = await provider.getTransactions('mwcxXm4jwz1K2hsrUJkbJ1YASC8Z4Vf4yB', {
+      fromBlock: 1697117,
+      toBlock: 1697117,
+      // verbose: true
+    });
+    
+    assert.ok(transactions.length >= 1, 'there should be one transaction');
+  });
 });

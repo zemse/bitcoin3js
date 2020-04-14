@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 const rateLimiter = require('./rate-limiter');
-const { isBytes32Hex } = require('../utils');
+const { isBytes32Hex, addUrlParams } = require('../utils');
 
 class BitapsProvider {
   /// @dev args can be an options object or network:string, apiKey:string arguments
@@ -91,6 +91,51 @@ class BitapsProvider {
       const response = await axios.get(this.baseUrl + '/address/state/' + address);
       if(response.data.error_code) throw new Error(errorMessage(response));
       return response.data.data.balance;
+    });
+  }
+
+  async getTransactions(address, options = {}) {
+    return await this._rateLimiter(async() => {
+      // convert start time and end time into block height using getBlock
+      let start, end, limit = 100, mode = 'brief';
+
+      if('startTime' in options) {
+        start = options.startTime;
+      } else if(options.fromBlock) {
+        const block = await this.getBlock(options.fromBlock);
+        start = block.blockTime;
+      }
+
+      if('endTime' in options) {
+        end = options.endTime;
+      } else if(options.toBlock) {
+        const block = await this.getBlock(options.toBlock);
+        end = block.blockTime;
+      }
+
+      if('verbose' in options) {
+        if(typeof options.verbose !== 'boolean') throw new Error('Verbose should be boolean');
+        if(options.verbose) {
+          mode = 'verbose';
+        }
+      }
+
+      let response;
+      while(true) {
+        response = await axios.get(
+          addUrlParams(this.baseUrl + '/address/transactions/' + address, {
+            start, end, limit, mode
+          })
+        );
+        if(response.data.error_code) throw new Error(errorMessage(response));
+
+        limit *= 10;
+        if(response.data.data.pages === 1) break;
+      }
+
+      // console.log({response});
+
+      return response.data.data.list;
     });
   }
 }
