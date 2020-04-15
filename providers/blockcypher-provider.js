@@ -25,12 +25,17 @@ class BlockcypherProvider extends RateLimiterProvider {
     return `Blockcypher Error: ${response.status}`;
   }
 
-  async getLatestBlock() {
+  async getBlockHeight() {
     return await this._rateLimiter(async() => {
       const response = await axios.get(addUrlParams(this._baseUrl, {token: this._apiKey}));
       if(response.data.error_code) throw new Error(errorMessage(response));
-      return response.data;
+      return response.data.height;
     });
+  }
+
+  async getLatestBlock() {
+    const latestBlockNumber = await this.getBlockHeight();
+    return await this.getBlock(latestBlockNumber);
   }
 
   async getBlock(blockHashOrHeight) {
@@ -42,7 +47,7 @@ class BlockcypherProvider extends RateLimiterProvider {
       const response = await axios.get(
         addUrlParams(this._baseUrl + '/blocks/' + blockHashOrHeight, {token: this._apiKey})
       );
-      return response.data;
+      return this.parseBlock(response.data);
     });
   }
 
@@ -83,7 +88,7 @@ class BlockcypherProvider extends RateLimiterProvider {
           && options.toBlock ? (txref.block_height <= options.toBlock) : true;
         });
       }
-    
+
       let parsedTransactions = [];
 
       if(response.data.txrefs && response.data.txrefs instanceof Array) {
@@ -133,6 +138,19 @@ class BlockcypherProvider extends RateLimiterProvider {
 
       return parsedTransactions;
     });
+  }
+
+  parseBlock(b) {
+    return {
+      height: b.height,
+      hash: '0x' + b.hash,
+      merkleRoot: '0x' +b.mrkl_root,
+      transactionsCount: b.n_tx,
+      nonce: b.nonce,
+      bits: b.bits,
+      version: b.ver,
+      timestamp: Math.round( (new Date(b.time)).getTime() / 1000 )
+    }
   }
 }
 

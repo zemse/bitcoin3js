@@ -145,8 +145,6 @@ class BitapsProvider extends RateLimiterProvider {
       hash: '0x' + b.hash,
       merkleRoot: '0x' +b.merkleRoot,
       transactionsCount: b.transactionsCount,
-      blockReward: b.blockReward,
-      blockFeeReward: b.blockFeeReward,
       nonce: b.nonce,
       bits: b.bits,
       version: b.version,
