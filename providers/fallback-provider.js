@@ -7,7 +7,7 @@ class FallbackProvider extends EventsProvider {
   constructor(providerArray, loadBalancer = true) {
     super();
     this._randomize = loadBalancer;
-    if(!providerArray instanceof Array) throw new Error('Fallback constructor argument should be an array');
+    if(!(providerArray instanceof Array)) throw new Error('Fallback constructor argument should be an array');
 
     if(!providerArray.length) throw new Error('providerArray should at least have one provider');
 
