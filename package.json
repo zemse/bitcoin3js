@@ -1,6 +1,6 @@
 {
   "name": "bitcoin3js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Complete Bitcoin Provider and Wallet Implementation",
   "main": "index.js",
   "scripts": {
@@ -12,15 +12,20 @@
   },
   "keywords": [
     "bitcoin",
+    "provider",
+    "blockcypher",
+    "bitaps",
+    "rate limiting",
+    "fallback",
     "wallet",
     "cryptography"
   ],
   "author": "Soham Zemse <sohamzemse143@gmail.com> (https://github.com/zemse)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zemse/bitcoin-js/issues"
+    "url": "https://github.com/zemse/bitcoin3js/issues"
   },
-  "homepage": "https://github.com/zemse/bitcoin-js#readme",
+  "homepage": "https://github.com/zemse/bitcoin3js#readme",
   "devDependencies": {
     "bs58check": "^2.1.2",
     "mocha": "^7.1.1"
