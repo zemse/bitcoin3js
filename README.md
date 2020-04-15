@@ -4,36 +4,87 @@
 
 Intends to be a complete Bitcoin Provider and Wallet Implementation. Currently, under development.
 
+## Installing
+
+You can install Bitcoin3js in your project using npm.
+
+```shell
+npm install bitcoin3js
+```
+
+## Quick Start with Provider
+
 ```javascript
 const bitcoin = require('bitcoin3js');
-const provider = new bitcoin.providers.BlockcypherProvider('test3', 'c29426c605e541bea307de3a54d94fcf');
+const provider = bitcoin.getDefaultProvider('test3');
+
+// gets latest block height
+const blockNumber = await provider.getBlockHeight();
+
+// get block by block height
+const block = await provider.getBlock(1234);
 
 // fetch balances in satoshis
 const balance = await provider.getBalance('mwcxXm4jwz1K2hsrUJkbJ1YASC8Z4Vf4yB');
 
+// get transactions of an address
+const transactions = await provider.getTransactions('mwcxXm4jwz1K2hsrUJkbJ1YASC8Z4Vf4yB', {
+  fromBlock: 1697117,
+  toBlock: 1697117
+});
+
+// add an event
 provider.on('block', blockNumber => {
   //do something
 });
-
 ```
-Roadmap:
-bitcoin
-  utils => containing common utility functions
 
-  Provider constructor => create an instance to interact with blockchain
-    get network obj
-    get blocknumber
-    get balance
-    get utxos
-    get transaction
-    get transaction fee rate
-    generate transaction confirmation promise with number of confirmations
-    events
-      customizable pooling interval
-      on balance change
-      on transaction received
+## Providers
 
-  Wallet constructor => create an instance which would have following methods
-    get balance, create transaction, sign transactions, push transaction
-    
- 
+A provider instance is used to interact with the Bitcoin blockchain. Currently, there is integration of Blockcypher and Bitaps APIs.
+
+### Constructing a Provider Instance
+```javascript
+const blockcypher = new bitcoin.providers.BlockcypherProvider('test3');
+// or
+const bitaps = new bitcoin.providers.BitapsProvider('test3');
+// network: 'main' for bitcoin main network, 'test3' for bitcoin test network
+```
+
+### Rate Limiters
+
+ Due to the presence of rate limits in the api providers, Bitcoin3js providers come with inbuilt rate limiters. You don't have to do anything. Though, you can customize the rate limiting variables.
+
+```javascript
+const { BlockcypherProvider } = require('bitcoin3js/providers');
+
+const blockcypher = new BlockcypherProvider({
+  network: network,
+  apiKey: 'a3c1aad4c151458da9b1fdee2a7fbdf3',
+  requestsLimit: 200,
+  seconds: 60*60 // 1 hour
+});
+```
+### Fallback Providers
+Fallback Provider aggregates multiple provider objects into one provider object and in event of the failure of one provider, it utilises other provider. It can also be used for load balancing between multiple providers.
+
+```javascript
+const { FallbackProvider } = require('bitcoin3js/providers');
+
+const provider = new FallbackProvider([ blockcypher, bitaps ]);
+```
+
+The `getDefaultProvider` demonstrated in the beginning is a `FallbackProvider` with providers `blockcypher` and `bitmaps`.
+
+## About
+
+I've started this project mainly because couldn't find a project related to bitcoin API providers. Definately, there are plenty of online resources made available by providers like Blockcypher to work with Bitcoin APIs but downtime is a factor. Your project would have to rely that the provider will be online 100%, which is of course might not be always possible. If you are ready to go few miles ahead, you need to do a complicated setup to rely on multiple API providers so that single point of failure won't be an issue. And from above you can see, the Fallback provider is what that solves this problem.
+
+### Further Roadmap:
+
+- More provider functionalities to be integrated
+- More provider apis to be integrated
+- Essential helper methods to work in Bitcoin Ecosystem
+- Wallet
+
+Roadmap will be updated as development will follow. Any suggestions or contributions are welcome.
