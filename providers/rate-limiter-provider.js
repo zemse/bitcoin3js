@@ -62,17 +62,19 @@ class RateLimiter {
   async call(callback) {
     if(this._promise) {
       await this._promise;
-      return await call(callback);
+      return await this.call(callback);
     }
 
     if(this._consumed >= this._requestsLimit) {
+      const _this = this;
       this._promise = new Promise(function(resolve, reject) {
         setTimeout(() => {
-          this._promise = null;
+          _this._promise = null;
+          _this._consumed = 0;
           resolve();
-        }, this._seconds);
+        }, (_this._seconds+1) * 1000);
       });
-      return await call(callback);
+      return await this.call(callback);
     }
 
     this._consumed++;
@@ -82,7 +84,7 @@ class RateLimiter {
 
 function rateLimiter(requestsLimit, seconds) {
   const rateLimiterInstance = new RateLimiter(requestsLimit, seconds);
-  return rateLimiterInstance.call;
+  return callback => rateLimiterInstance.call(callback);
 }
 
 module.exports = RateLimiterProvider;
