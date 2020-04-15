@@ -83,7 +83,55 @@ class BlockcypherProvider extends RateLimiterProvider {
           && options.toBlock ? (txref.block_height <= options.toBlock) : true;
         });
       }
-      return response.data.txrefs || [];
+    
+      let parsedTransactions = [];
+
+      if(response.data.txrefs && response.data.txrefs instanceof Array) {
+        /// @dev take copy txRefs to a fresh array
+        let remainingTxRefs = [...response.data.txrefs];
+
+        while(remainingTxRefs.length > 0) {
+          const hash = remainingTxRefs[0].tx_hash;
+
+          /// @dev filter txRefs of same transaction
+          const sameTxRefs = remainingTxRefs.filter(txref => txref.tx_hash === hash);
+
+          let sent = 0, received = 0;
+
+          sameTxRefs.forEach(txref => {
+            /// @dev sanitizing blockcypher data
+            if((txref.tx_input_n === -1 && txref.tx_output_n === -1)
+            || (txref.tx_input_n !== -1 && txref.tx_output_n !== -1)) {
+              throw new Error('Invalid Blockcypher Data');
+            }
+
+            /// @dev this txref is an input of this tx from this address which decreases balance
+            if(txref.tx_input_n !== -1) {
+              sent += txref.value;
+            }
+
+            /// @dev this txref is an output of this tx to this address which increases balance
+            if(txref.tx_output_n !== -1) {
+              received += txref.value;
+            }
+          });
+
+          parsedTransactions.push({
+            hash,
+            height: remainingTxRefs[0].block_height,
+            address,
+            sent,
+            received,
+            changeInBalance: received - sent,
+            timestamp: Math.round( (new Date(remainingTxRefs[0].confirmed)).getTime() / 1000 ),
+          });
+
+          /// @dev remove processed txRefs from remainingTxRefs
+          remainingTxRefs = remainingTxRefs.filter(txref => txref.tx_hash !== hash);
+        }
+      }
+
+      return parsedTransactions;
     });
   }
 }
