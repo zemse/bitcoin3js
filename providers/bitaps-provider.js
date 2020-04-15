@@ -1,10 +1,10 @@
 // Documentation: https://developer.bitaps.com/blockchain
 
 const axios = require('axios');
-const BaseProvider = require('./base-provider');
+const RateLimiterProvider = require('./rate-limiter-provider');
 const { isBytes32Hex, addUrlParams } = require('../utils');
 
-class BitapsProvider extends BaseProvider {
+class BitapsProvider extends RateLimiterProvider {
   /// @dev args can be an options object or network:string, apiKey:string arguments
   constructor(...args) {
     super(...args);

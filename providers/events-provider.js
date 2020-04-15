@@ -1,5 +1,8 @@
-class EventsProvider {
+const BaseProvider = require('./base-provider');
+
+class EventsProvider extends BaseProvider {
   constructor() {
+    super();
     this._lastBlockNumber = -1;
 
     this._pollingInterval = 30000;

@@ -1,10 +1,10 @@
 /// @dev Documentation: https://www.blockcypher.com/dev/bitcoin/
 
 const axios = require('axios');
-const BaseProvider = require('./base-provider');
+const RateLimiterProvider = require('./rate-limiter-provider');
 const { addUrlParams } = require('../utils');
 
-class BlockcypherProvider extends BaseProvider {
+class BlockcypherProvider extends RateLimiterProvider {
   constructor(...args) {
     super(...args);
   }
