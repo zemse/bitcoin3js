@@ -1,10 +1,10 @@
 {
   "name": "bitcoin3js",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Complete Bitcoin Provider and Wallet Implementation",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test.js"
+    "test": "mocha --timeout 20000 test.js"
   },
   "repository": {
     "type": "git",
