@@ -37,6 +37,16 @@ describe('Fallback Provider', () => {
     assert.equal(block.height, 1234, 'fetched block should have correct block height');
   });
 
+  it('should fetch block list', async() => {
+    const numberList = [12, 34];
+    const blockList = await provider.getBlocks(numberList);
+    // console.log(blockList);
+    assert.ok(blockList instanceof Array, 'output should be array');
+    blockList.forEach((block, i) => {
+      assert.equal(block.height, numberList[i], 'fetched block should have correct block height');
+    })
+  });
+
   it('should fetch balance', async() => {
     const balance = await provider.getBalance('mwcxXm4jwz1K2hsrUJkbJ1YASC8Z4Vf4yB');
 

@@ -74,6 +74,10 @@ class FallbackProvider extends EventsProvider {
     return this._fallback('getBlock', [blockHashOrHeight]);
   }
 
+  getBlocks(blockHashOrHeightArray) {
+    return this._fallback('getBlocks', [blockHashOrHeightArray]);
+  }
+
   getBalance(address) {
     return this._fallback('getBalance',[address]);
   }

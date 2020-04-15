@@ -49,6 +49,34 @@ class BitapsProvider extends RateLimiterProvider {
     });
   }
 
+  async getBlocks(blockHashOrHeightArray) {
+    if(!(blockHashOrHeightArray instanceof Array)) throw new Error('blockHeightArray should be an Array');
+    if(!blockHashOrHeightArray.length) throw new Error('blockHeightArray should at least have one element');
+    // @dev commented because blockHash list api is giving error for block hashes, so currently restricting to only blockHeights. Emailed the Bitaps team regarding the same.
+    // let isBlockHeight = typeof blockHashOrHeightArray[0] === 'number';
+    // if(isBlockHeight) {
+      blockHashOrHeightArray.forEach(blockHashOrHeight => {
+        if(typeof blockHashOrHeight !== 'number') throw new Error('All blockheights should be number');
+      });
+
+      return await this._rateLimiter(async() => {
+        const response = await axios.get(this._baseUrl + '/blocks/height/list/'+blockHashOrHeightArray.join(','));
+        if(response.data.error_code) throw new Error(errorMessage(response));
+        return response.data.data.map((block, i) => block[blockHashOrHeightArray[i]]);
+      });
+    // } else {
+      // blockHashOrHeightArray.forEach(blockHashOrHeight => {
+      //   if(isBytes32Hex(blockHashOrHeight)) throw new Error('All blockhashes should be bytes32 hex strings');
+      // });
+      //
+      // return await this._rateLimiter(async() => {
+      //   const response = await axios.get(this._baseUrl + '/blocks/hash/list/'+blockHashOrHeight.map(s => s.slice(2)).join(','));
+      //   if(response.data.error_code) throw new Error(errorMessage(response));
+      //   return response.data.data;
+      // });
+    // }
+  }
+
   async getBalance(address) {
     // add checks for valid network address
     return await this._rateLimiter(async() => {

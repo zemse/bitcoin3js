@@ -46,6 +46,16 @@ describe('Bitaps Provider', () => {
     assert.equal(block.height, 1234, 'fetched block should have correct block height');
   });
 
+  it('should fetch block list', async() => {
+    const numberList = [12, 34];
+    const blockList = await provider.getBlocks(numberList);
+    
+    assert.ok(blockList instanceof Array, 'output should be array');
+    blockList.forEach((block, i) => {
+      assert.equal(block.height, numberList[i], 'fetched block should have correct block height');
+    })
+  });
+
   it('should fetch balance', async() => {
     const balance = await provider.getBalance('mwcxXm4jwz1K2hsrUJkbJ1YASC8Z4Vf4yB');
 
@@ -58,7 +68,7 @@ describe('Bitaps Provider', () => {
       toBlock: 1697117,
       // verbose: true
     });
-    
+
     assert.ok(transactions.length >= 1, 'there should be one transaction');
   });
 });
