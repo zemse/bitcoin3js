@@ -1,6 +1,6 @@
 {
   "name": "bitcoin3js",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Complete Bitcoin Provider and Wallet Implementation",
   "main": "index.js",
   "scripts": {
