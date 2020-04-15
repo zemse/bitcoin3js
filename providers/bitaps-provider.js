@@ -15,11 +15,11 @@ class BitapsProvider extends RateLimiterProvider {
       case 'main':
         return 'https://api.bitaps.com/btc/v1/blockchain';
       case 'test3':
-        return 'https://api.bitaps.com/btc/testnet/v1/blockchain/';
+        return 'https://api.bitaps.com/btc/testnet/v1/blockchain';
       case 'ltc':
-        return 'https://api.bitaps.com/ltc/v1/blockchain/';
+        return 'https://api.bitaps.com/ltc/v1/blockchain';
       case 'tltc':
-        return 'https://api.bitaps.com/ltc/testnet/v1/blockchain/';
+        return 'https://api.bitaps.com/ltc/testnet/v1/blockchain';
       default:
         throw new Error('Invalid Network: '+this._network);
     }
@@ -42,8 +42,10 @@ class BitapsProvider extends RateLimiterProvider {
 
     if(typeof blockHashOrHeight === 'string' && blockHashOrHeight.slice(0,2) === '0x') blockHashOrHeight = blockHashOrHeight.slice(2);
 
-    return await this._rateLimiter(() => {
-      return axios.get(this._baseUrl + '/block/'+blockHashOrHeight)
+    return await this._rateLimiter(async() => {
+      const response = await axios.get(this._baseUrl + '/block/'+blockHashOrHeight);
+      if(response.data.error_code) throw new Error(errorMessage(response));
+      return response.data.data.block;
     });
   }
 

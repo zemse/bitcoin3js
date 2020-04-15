@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 const RateLimiterProvider = require('./rate-limiter-provider');
-const { addUrlParams } = require('../utils');
+const { addUrlParams, isBytes32Hex } = require('../utils');
 
 class BlockcypherProvider extends RateLimiterProvider {
   constructor(...args) {
@@ -39,9 +39,10 @@ class BlockcypherProvider extends RateLimiterProvider {
     if(typeof blockHashOrHeight === 'string' && blockHashOrHeight.slice(0,2) === '0x') blockHashOrHeight = blockHashOrHeight.slice(2);
 
     return await this._rateLimiter(async() => {
-      return await axios.get(
-        addUrlParams(this.baseUrl + '/blocks/' + blockHashOrHeight, {token: this._apiKey})
+      const response = await axios.get(
+        addUrlParams(this._baseUrl + '/blocks/' + blockHashOrHeight, {token: this._apiKey})
       );
+      return response.data;
     });
   }
 
