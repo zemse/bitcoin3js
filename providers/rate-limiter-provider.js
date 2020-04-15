@@ -84,7 +84,7 @@ class RateLimiter {
     try {
        output = await callback();
     } catch (error) {
-      if(error.response.status === 429) {
+      if(error.response && error.response.status === 429) {
         this._consumed = this._requestsLimit;
         return await this.call(callback);
       }
