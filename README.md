@@ -18,7 +18,7 @@ npm install bitcoin3js
 const bitcoin = require('bitcoin3js');
 const provider = bitcoin.getDefaultProvider('test3');
 
-// gets latest block height
+// get latest block height
 const blockNumber = await provider.getBlockHeight();
 
 // get block by block height
@@ -35,7 +35,7 @@ const transactions = await provider.getTransactions('mwcxXm4jwz1K2hsrUJkbJ1YASC8
 
 // add an event
 provider.on('block', blockNumber => {
-  //do something
+  // do something
 });
 ```
 
@@ -78,7 +78,7 @@ The `getDefaultProvider` demonstrated in the beginning is a `FallbackProvider` w
 
 ## About
 
-I've started this project mainly because couldn't find a project related to bitcoin API providers. Definately, there are plenty of online resources made available by providers like Blockcypher to work with Bitcoin APIs but downtime is a factor. Your project would have to rely that the provider will be online 100%, which is of course might not be always possible. If you are ready to go few miles ahead, you need to do a complicated setup to rely on multiple API providers so that single point of failure won't be an issue. And from above you can see, the Fallback provider is what that solves this problem.
+I've started this project mainly because couldn't find a reliable project related to bitcoin API providers. Definitely, there are plenty of online resources made available by providers like Blockcypher to work with Bitcoin APIs and most of the projects rely with a single API provider. If you're building a project which needs a reliable source of information, provider downtime is a factor to consider. Your project would have to rely that the provider will be online 100%, which of course might not be always possible. If you are ready to go few miles ahead, you need to do a complicated setup to rely on multiple API providers so that single point of failure won't be an issue. And from above you can see, the `FallbackProvider` is what that solves this problem.
 
 ### Further Roadmap:
 
