@@ -5,7 +5,7 @@ describe('Default Provider', () => {
   let provider;
 
   it('should create an instance', async() => {
-    provider = bitcoin.providers.getDefaultProvider('test3');
+    provider = bitcoin.getDefaultProvider('test3');
 
     assert.ok(provider instanceof bitcoin.providers.FallbackProvider, 'should be an instance of Blockcypher provider');
   });
