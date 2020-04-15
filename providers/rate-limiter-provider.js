@@ -72,13 +72,25 @@ class RateLimiter {
           _this._promise = null;
           _this._consumed = 0;
           resolve();
-        }, (_this._seconds+1) * 1000);
+        }, (_this._seconds + 1) * 1000);
       });
       return await this.call(callback);
     }
 
     this._consumed++;
-    return await callback();
+
+    let output;
+
+    try {
+       output = await callback();
+    } catch (error) {
+      if(error.response.status === 429) {
+        this._consumed = this._requestsLimit;
+        return await this.call(callback);
+      }
+    }
+
+    return output;
   }
 }
 
