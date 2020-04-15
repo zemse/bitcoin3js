@@ -125,9 +125,19 @@ class BitapsProvider extends RateLimiterProvider {
         if(response.data.data.pages === 1) break;
       }
 
-      // console.log({response});
+      console.log('bitaps tx', response.data.data.list);
 
-      return response.data.data.list;
+      return response.data.data.list.map(tx => {
+        return {
+          hash: '0x' + tx.txId,
+          height: tx.blockHeight,
+          address,
+          received: tx.received,
+          sent: tx.sent,
+          changeInBalance: tx.received - tx.sent,
+          timestamp: tx.timestamp
+        }
+      });
     });
   }
 }

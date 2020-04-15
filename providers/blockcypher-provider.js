@@ -117,11 +117,11 @@ class BlockcypherProvider extends RateLimiterProvider {
           });
 
           parsedTransactions.push({
-            hash,
+            hash: '0x' + hash,
             height: remainingTxRefs[0].block_height,
             address,
-            sent,
             received,
+            sent,
             changeInBalance: received - sent,
             timestamp: Math.round( (new Date(remainingTxRefs[0].confirmed)).getTime() / 1000 ),
           });

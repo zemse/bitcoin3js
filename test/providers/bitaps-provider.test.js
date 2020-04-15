@@ -49,7 +49,7 @@ describe('Bitaps Provider', () => {
   it('should fetch block list', async() => {
     const numberList = [12, 34];
     const blockList = await provider.getBlocks(numberList);
-    
+
     assert.ok(blockList instanceof Array, 'output should be array');
     blockList.forEach((block, i) => {
       assert.equal(block.height, numberList[i], 'fetched block should have correct block height');
@@ -63,12 +63,10 @@ describe('Bitaps Provider', () => {
   });
 
   it('fetch transactions for address', async() => {
-    const transactions = await provider.getTransactions('mwcxXm4jwz1K2hsrUJkbJ1YASC8Z4Vf4yB', {
-      fromBlock: 1697117,
-      toBlock: 1697117,
-      // verbose: true
+    const transactions = await provider.getTransactions('mn8aHyjKxMoh4cPP1EUYZSpRSt1SoW7Wus', {
+      fromBlock: 1697329,
+      toBlock: 1697434
     });
-
-    assert.ok(transactions.length >= 1, 'there should be one transaction');
+    assert.equal(transactions.length, 3, 'there should be three transactions');
   });
 });
