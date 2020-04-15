@@ -33,7 +33,7 @@ class BitapsProvider extends RateLimiterProvider {
     return await this._rateLimiter(async() => {
       const response = await axios.get(this._baseUrl + '/block/last');
       if(response.data.error_code) throw new Error(errorMessage(response));
-      return response.data.data.block;
+      return this.parseBlock(response.data.data.block);
     });
   }
 
@@ -45,7 +45,7 @@ class BitapsProvider extends RateLimiterProvider {
     return await this._rateLimiter(async() => {
       const response = await axios.get(this._baseUrl + '/block/'+blockHashOrHeight);
       if(response.data.error_code) throw new Error(errorMessage(response));
-      return response.data.data.block;
+      return this.parseBlock(response.data.data.block);
     });
   }
 
@@ -62,7 +62,7 @@ class BitapsProvider extends RateLimiterProvider {
       return await this._rateLimiter(async() => {
         const response = await axios.get(this._baseUrl + '/blocks/height/list/'+blockHashOrHeightArray.join(','));
         if(response.data.error_code) throw new Error(errorMessage(response));
-        return response.data.data.map((block, i) => block[blockHashOrHeightArray[i]]);
+        return response.data.data.map((block, i) => this.parseBlock(block[blockHashOrHeightArray[i]]));
       });
     // } else {
       // blockHashOrHeightArray.forEach(blockHashOrHeight => {
@@ -95,14 +95,14 @@ class BitapsProvider extends RateLimiterProvider {
         start = options.startTime;
       } else if(options.fromBlock) {
         const block = await this.getBlock(options.fromBlock);
-        start = block.blockTime;
+        start = block.timestamp;
       }
 
       if('endTime' in options) {
         end = options.endTime;
       } else if(options.toBlock) {
         const block = await this.getBlock(options.toBlock);
-        end = block.blockTime;
+        end = block.timestamp;
       }
 
       if('verbose' in options) {
@@ -125,8 +125,6 @@ class BitapsProvider extends RateLimiterProvider {
         if(response.data.data.pages === 1) break;
       }
 
-      console.log('bitaps tx', response.data.data.list);
-
       return response.data.data.list.map(tx => {
         return {
           hash: '0x' + tx.txId,
@@ -139,6 +137,21 @@ class BitapsProvider extends RateLimiterProvider {
         }
       });
     });
+  }
+
+  parseBlock(b) {
+    return {
+      height: b.height,
+      hash: '0x' + b.hash,
+      merkleRoot: '0x' +b.merkleRoot,
+      transactionsCount: b.transactionsCount,
+      blockReward: b.blockReward,
+      blockFeeReward: b.blockFeeReward,
+      nonce: b.nonce,
+      bits: b.bits,
+      version: b.version,
+      timestamp: b.blockTime
+    }
   }
 }
 

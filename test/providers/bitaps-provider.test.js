@@ -38,11 +38,13 @@ describe('Bitaps Provider', () => {
 
   it('should fetch latest block', async() => {
     const block = await provider.getLatestBlock();
+
     assert.ok(block.height > 0, 'fetched block should have positive block height');
   })
 
   it('should fetch block', async() => {
     const block = await provider.getBlock(1234);
+
     assert.equal(block.height, 1234, 'fetched block should have correct block height');
   });
 
@@ -67,6 +69,7 @@ describe('Bitaps Provider', () => {
       fromBlock: 1697329,
       toBlock: 1697434
     });
+    
     assert.equal(transactions.length, 3, 'there should be three transactions');
   });
 });
