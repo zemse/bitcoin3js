@@ -36,6 +36,16 @@ describe('Bitaps Provider', () => {
     assert.equal(blockNumber, height);
   });
 
+  it('should fetch latest block', async() => {
+    const block = await provider.getLatestBlock();
+    assert.ok(block.height > 0, 'fetched block should have positive block height');
+  })
+
+  it('should fetch block', async() => {
+    const block = await provider.getBlock(1234);
+    assert.equal(block.height, 1234, 'fetched block should have correct block height');
+  });
+
   it('should fetch balance', async() => {
     const balance = await provider.getBalance('mwcxXm4jwz1K2hsrUJkbJ1YASC8Z4Vf4yB');
 
