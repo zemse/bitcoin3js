@@ -24,7 +24,10 @@ class EventsProvider extends BaseProvider {
   onBlock(callback) {
     const intF = async() => {
       const newBlockHeight = await this.getBlockHeight();
-      if(this._lastBlockNumber < newBlockHeight && this._lastBlockNumber !== -1) {
+      if(this._lastBlockNumber === -1) {
+        return this._lastBlockNumber = newBlockHeight;
+      }
+      if(this._lastBlockNumber < newBlockHeight) {
         while(this._lastBlockNumber < newBlockHeight) {
           this._lastBlockNumber++;
           callback(this._lastBlockNumber);
