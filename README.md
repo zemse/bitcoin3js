@@ -83,6 +83,8 @@ The `getDefaultProvider` demonstrated in the beginning is a `FallbackProvider` w
 
 MoveOn mechanism comes inbuilt in a `FallbackProvider`. In some cases, an API call response is delayed, i.e. it doesn't resolve within a certain time, either due to server processing delay or delayed purposefully by the rate limiter (this happens a lot with `BlockcypherProvider` since it's got freedom for only 200 free calls in 1 hour, and if you are out of'em, it'd not resolve for a long time). So the MoveOn mechanism makes the Fallback provider move on to the next provider, if the call doesn't resolve within a specified `moveOnDelay` time.
 
+The mechanism is active by default. Though it can be customized if needed.
+
 ```javascript
 const defaultProvider = bitcoin.getDefaultProvider({
   network: 'test3',
@@ -93,6 +95,7 @@ const fallbackProvider = new FallbackProvider([ blockcypher, bitaps ], {
   moveOnDelay: 800
 });
 ```
+The end result is, a seamless bitcoin provider experience.
 
 ## About
 
