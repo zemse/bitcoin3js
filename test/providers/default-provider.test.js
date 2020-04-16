@@ -5,7 +5,30 @@ describe('Default Provider', () => {
   let provider;
 
   it('should create an instance', async() => {
-    provider = bitcoin.getDefaultProvider('test3');
+    provider = bitcoin.getDefaultProvider('test3', {blockcypher: 'a3c1aad4c151458da9b1fdee2a7fbdf3'});
+
+    assert.ok(provider instanceof bitcoin.providers.FallbackProvider, 'should be an instance of Blockcypher provider');
+  });
+
+  it('should create an instance with options object', async() => {
+    const options = {
+      network: 'test3',
+      config: {
+        blockcypher: {
+          apiKey: 'a3c1aad4c151458da9b1fdee2a7fbdf3',
+          requestsLimit: 10,
+          seconds: 70
+        },
+        bitaps: {
+          requestsLimit: 10,
+          seconds: 70
+        }
+      }
+    };
+
+    provider = bitcoin.getDefaultProvider(options);
+
+    assert.equal(provider._providerArray[0]._apiKey, options.config.blockcypher.apiKey, 'blockcyper api key should be set');
 
     assert.ok(provider instanceof bitcoin.providers.FallbackProvider, 'should be an instance of Blockcypher provider');
   });
