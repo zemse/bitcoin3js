@@ -64,15 +64,16 @@ class FallbackProvider extends EventsProvider {
 
   /// @dev implementation of fallback mechanism
   async _fallback(method, args = []) {
+    let movedOnPromises = [];
+    let errors = [];
     for(const provider of this._randomizedProviderArray) {
       // console.log(provider.constructor);
+      let outputPromise;
       try {
         if(!provider[method]) continue;
 
-        let output;
-
         if(this._moveOnDelay) {
-          const outputPromise = provider[method](...args);
+          outputPromise = provider[method](...args);
 
           let timeoutId;
           const _this = this;
@@ -80,20 +81,43 @@ class FallbackProvider extends EventsProvider {
             timeoutId = setTimeout(reject.bind(this, new Error('Too much delay, fallback is moving on to next provider')), _this._moveOnDelay);
           });
 
-          output = await Promise.race([outputPromise, deplayPromise]);
+          const output = await Promise.race([outputPromise, deplayPromise]);
           // console.log('clear timeout');
           clearTimeout(timeoutId);
+          return output;
         } else {
-          output = await provider[method](...args);
+          return await provider[method](...args);
         }
-
-        return output;
       } catch (error) {
-        console.log(provider.constructor, error);
+        // console.log(provider.constructor, error);
+        errors.push(error);
+        if(error.message.includes('Too much delay, fallback is moving on to next provider')) {
+          // console.log('moving on');
+          movedOnPromises.push(outputPromise);
+        }
         continue;
       }
     }
 
+    /// @dev below code is a replacement of Promise.any (which is still in Stage 3)
+    ///   once it reaches stage 4, we can use that instead
+    while(movedOnPromises.length) {
+      const output = await Promise.race(movedOnPromises.map((promise, i) => {
+        return new Promise(async function(resolve, reject) {
+          try {
+            const output = await promise;
+            resolve(output);
+          } catch(error) {
+            movedOnPromises.splice(i,1);
+            errors.push(error);
+            resolve(null);
+          }
+        });
+      }));
+      if(output !== null) return output;
+    }
+
+    console.log('Errors:', errors);
     throw new Error('All providers failed');
   }
 
