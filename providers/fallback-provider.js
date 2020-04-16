@@ -9,10 +9,10 @@ class FallbackProvider extends EventsProvider {
     if(typeof loadBalancer === 'object') {
       const options = loadBalancer;
       this._randomize = 'loadBalancer' in options ? options.loadBalancer : true;
-      this._moveOnDelay = 'moveOnDelay' in options ? options.moveOnDelay : 16000;
+      this._moveOnDelay = 'moveOnDelay' in options ? options.moveOnDelay : 1000;
     } else {
       this._randomize = loadBalancer !== undefined ? loadBalancer : true;
-      this._moveOnDelay = moveOnDelay !== undefined ? moveOnDelay : 16000;
+      this._moveOnDelay = moveOnDelay !== undefined ? moveOnDelay : 1000;
     }
 
     if(typeof this._randomize !== 'boolean') throw new Error('option loadBalancer to the FallbackProvider should be of type boolean')

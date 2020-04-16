@@ -34,7 +34,7 @@ const getDefaultProvider = (network, apiKey = {}) => {
     })
   ], {
     loadBalancer: options.loadBalancer || true,
-    moveOnDelay: options.moveOnDelay || 16000
+    moveOnDelay: options.moveOnDelay || 1000
   })
 };
 
