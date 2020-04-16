@@ -4,9 +4,24 @@ const BitapsProvider = require('./bitaps-provider');
 
 /// @dev inheriting base provider for getting aliases
 class FallbackProvider extends EventsProvider {
-  constructor(providerArray, loadBalancer = true) {
+  constructor(providerArray, loadBalancer, moveOnDelay) {
     super();
-    this._randomize = loadBalancer;
+    if(typeof loadBalancer === 'object') {
+      const options = loadBalancer;
+      this._randomize = 'loadBalancer' in options ? options.loadBalancer : true;
+      this._moveOnDelay = 'moveOnDelay' in options ? options.moveOnDelay : 16000;
+    } else {
+      this._randomize = loadBalancer !== undefined ? loadBalancer : true;
+      this._moveOnDelay = moveOnDelay !== undefined ? moveOnDelay : 16000;
+    }
+
+    if(typeof this._randomize !== 'boolean') throw new Error('option loadBalancer to the FallbackProvider should be of type boolean')
+    if(typeof this._moveOnDelay !== 'number') throw new Error('option moveOnDelay to the FallbackProvider should be of type number')
+
+    if(this._moveOnDelay && this._moveOnDelay < 200) {
+      console.log(`\nWarning: moveOnDelay of ${this._moveOnDelay} ms is too low. This might cause unintented behaviour. If you meant ${this._moveOnDelay} sec, please multiply it with 1000 since javascript works with milli second time unit.\n`);
+    }
+
     if(!(providerArray instanceof Array)) throw new Error('Fallback constructor argument should be an array');
 
     if(!providerArray.length) throw new Error('providerArray should at least have one provider');
@@ -53,10 +68,28 @@ class FallbackProvider extends EventsProvider {
       // console.log(provider.constructor);
       try {
         if(!provider[method]) continue;
-        const output = await provider[method](...args);
+
+        let output;
+
+        if(this._moveOnDelay) {
+          const outputPromise = provider[method](...args);
+
+          let timeoutId;
+          const _this = this;
+          const deplayPromise = new Promise(function(resolve, reject) {
+            timeoutId = setTimeout(reject.bind(this, new Error('Too much delay, fallback is moving on to next provider')), _this._moveOnDelay);
+          });
+
+          output = await Promise.race([outputPromise, deplayPromise]);
+          // console.log('clear timeout');
+          clearTimeout(timeoutId);
+        } else {
+          output = await provider[method](...args);
+        }
+
         return output;
       } catch (error) {
-        console.log(error);
+        console.log(provider.constructor, error);
         continue;
       }
     }
