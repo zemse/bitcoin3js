@@ -135,7 +135,7 @@ class BitapsProvider extends RateLimiterProvider {
           changeInBalance: tx.received - tx.sent,
           timestamp: tx.timestamp
         }
-      });
+      }).filter(tx => (!start || start <= tx.timestamp) && (!end || tx.timestamp <= end));
     });
   }
 

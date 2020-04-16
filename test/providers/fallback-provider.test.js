@@ -69,10 +69,10 @@ describe('Fallback Provider', () => {
   });
 
   it('fetch transactions for address', async() => {
-    const transactions = await provider.getTransactions('mwcxXm4jwz1K2hsrUJkbJ1YASC8Z4Vf4yB', {
-      fromBlock: 1697117,
-      toBlock: 1697117
+    const transactions = await provider.getTransactions('mn8aHyjKxMoh4cPP1EUYZSpRSt1SoW7Wus', {
+      fromBlock: 1697329,
+      toBlock: 1697434
     });
-    assert.equal(transactions.length, 1, 'there should be one transaction');
+    assert.equal(transactions.length, 3, 'there should be three transactions');
   });
 });
