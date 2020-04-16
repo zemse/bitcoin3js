@@ -53,28 +53,46 @@ const bitaps = new bitcoin.providers.BitapsProvider('test3');
 
 ### Rate Limiters
 
- Due to the presence of rate limits in the api providers, Bitcoin3js providers come with inbuilt rate limiters. You don't have to do anything. Though, you can customize the rate limiting variables.
+Due to the presence of rate limits in the api providers, Bitcoin3js providers come with inbuilt rate limiters. You don't have to do anything. Though, you can customize the rate limiting variables.
 
 ```javascript
 const { BlockcypherProvider } = require('bitcoin3js/providers');
 
 const blockcypher = new BlockcypherProvider({
-  network: network,
+  network: 'test3',
   apiKey: 'a3c1aad4c151458da9b1fdee2a7fbdf3',
   requestsLimit: 200,
   seconds: 60*60 // 1 hour
 });
 ```
 ### Fallback Providers
+
 Fallback Provider aggregates multiple provider objects into one provider object and in event of the failure of one provider, it utilises other provider. It can also be used for load balancing between multiple providers.
 
 ```javascript
 const { FallbackProvider } = require('bitcoin3js/providers');
 
-const provider = new FallbackProvider([ blockcypher, bitaps ]);
+const provider = new FallbackProvider([ blockcypher, bitaps ], {
+  loadBalancer: false // by default: true
+});
 ```
 
 The `getDefaultProvider` demonstrated in the beginning is a `FallbackProvider` with providers `blockcypher` and `bitmaps`.
+
+### MoveOn Mechanism
+
+MoveOn mechanism comes inbuilt in a `FallbackProvider`. In some cases, an API call response is delayed, i.e. it doesn't resolve within a certain time, either due to server processing delay or delayed purposefully by the rate limiter (this happens a lot with `BlockcypherProvider` since it's got freedom for only 200 free calls in 1 hour, and if you are out of'em, it'd not resolve for a long time). So the MoveOn mechanism makes the Fallback provider move on to the next provider, if the call doesn't resolve within a specified `moveOnDelay` time.
+
+```javascript
+const defaultProvider = bitcoin.getDefaultProvider({
+  network: 'test3',
+  moveOnDelay: 800 // by default: 1000
+});
+// or
+const fallbackProvider = new FallbackProvider([ blockcypher, bitaps ], {
+  moveOnDelay: 800
+});
+```
 
 ## About
 
@@ -83,6 +101,7 @@ I've started this project mainly because couldn't find a reliable project relate
 ### Further Roadmap:
 
 - More provider functionalities to be integrated
+- A good documentation
 - More provider apis to be integrated
 - Essential helper methods to work in Bitcoin Ecosystem
 - Wallet
