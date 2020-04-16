@@ -15,7 +15,7 @@ class RateLimiterProvider extends EventsProvider {
       if(!options.network) throw new Error('network property is not present');
       this._network = options.network;
       this._baseUrl; /// @dev for checking valid network type
-      if(options._apiKey) this.apiKey = options.network;
+      if('apiKey' in options) this._apiKey = options.apiKey;
       if(options.requestsLimit || options.seconds) {
         if(!options.requestsLimit) throw new Error('requestsLimit property is not present');
         if(!options.seconds) throw new Error('seconds property is not present');
