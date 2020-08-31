@@ -1,3 +1,5 @@
+> **Deprecation Notice:** Underlying providers are very unreliable currently. Specially the `bitaps` node is mostly on an older block number which causes production issues. There is no meaning to use `BlockCypher` without purchasing their API keys due to their horrible rate limit criteria. I'll try to find and support more number of reliable BTC data providers and also incorporate a quorum logic to rule out out-of-sync/dishonest providers. Also, this library needs to be rewritten in TypeScript. I'm running very busy these days and cannot maintain this currently. I'm deprecating this package and do not advice it's use in production.
+
 # Bitcoin3js
 
 [![Node.js CI](https://github.com/zemse/bitcoin3js/workflows/Node.js%20CI/badge.svg)](https://github.com/zemse/bitcoin3js/workflows/Node.js%20CI/badge.svg)
