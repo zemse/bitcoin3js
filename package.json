@@ -31,7 +31,7 @@
     "mocha": "^7.1.1"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bitcoinjs-lib": "^5.1.7",
     "bs58": "^4.0.1",
     "ethers": "^4.0.46",
